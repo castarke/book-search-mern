@@ -1,30 +1,47 @@
 import React from 'react';
+import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SearchBooks from './pages/SearchBooks';
 import SavedBooks from './pages/SavedBooks';
 import Navbar from './components/Navbar';
 
+const httpLink = createHttpLink({
+  uri: '/graphql'
+})
+
+const client = new ApolloClient({
+  uri: '/graphql',
+  cache: new InMemoryCache()
+})
+
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('id_token');
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  };
+});
+
 function App() {
   return (
-    <Router>
-      <>
+    <ApolloProvider client={client}>
+      <Router>
+        <>
         <Navbar />
         <Routes>
-          <Route 
-            path='/' 
-            element={<SearchBooks />} 
-          />
-          <Route 
-            path='/saved' 
-            element={<SavedBooks />} 
-          />
-          <Route 
-            path='*'
-            element={<h1 className='display-2'>Wrong page!</h1>}
+        <Route path="/" element={<SearchBooks />} />
+          <Route path="/saved" element={<SavedBooks />} />
+          <Route
+            path="*"
+            element={<h1 className="display-2">Wrong page!</h1>}
           />
         </Routes>
-      </>
-    </Router>
+        </>
+      </Router>
+    </ApolloProvider>
   );
 }
 
