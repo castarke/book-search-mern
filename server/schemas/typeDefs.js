@@ -19,6 +19,11 @@ type User {
   bookCount: Int!
 }
 
+type Auth {
+  token: ID!
+  user: User
+}
+
 input BookInput {
   bookId: String!
   authors: [String]
@@ -29,13 +34,12 @@ input BookInput {
 }
 
 type Query {
-  tech:[Tech]!
-  getUser: User
+  me: User
 }
 
 type Mutation {
-  createUser( username: String!, email: String!, password: String!) : User
-  loginUser(email: String!, password: String!) : User
+  createUser( username: String!, email: String!, password: String!): Auth
+  loginUser(email: String!, password: String!) : Auth
   saveBook(book: BookInput!) : User
   removeBook( bookId: String!) : User
 }
